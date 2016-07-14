@@ -22,7 +22,7 @@ class ps2000(object):
 
 	# open port upon initialization
 	def __init__(self, port='/dev/ttyACM0'):
-		# set timeout to 0.1s to guarantee minimum interval time of 50ms
+		# set timeout to 0.06s to guarantee minimum interval time of 50ms
 		self.ser_dev = serial.Serial(port, timeout=0.06, baudrate=115200, parity=serial.PARITY_ODD)
 		self.u_nom = self.get_nominal_voltage()
 		self.i_nom = self.get_nominal_current()
@@ -67,7 +67,7 @@ class ps2000(object):
 			return False
 
 		if ans[3] == 0x00:
-			# print('ERROR: no error (really!)')
+			# this is used as an acknowledge
 			return False
 		elif ans[3] == 0x03:
 			print('ERROR: checksum incorrect')
@@ -107,7 +107,7 @@ class ps2000(object):
 		# send telegram
 		self.ser_dev.write(telegram)
 
-		# receive response
+		# receive response (always ask for more than the longest answer)
 		ans = self.ser_dev.read(100)
 
 		if self.verbose:
@@ -118,7 +118,7 @@ class ps2000(object):
 
 		# if the answer is too short, the checksum may be missing
 		if len(ans) < 5:
-			print('ERROR: short answer (%d bytes received)' % (len(ans)))
+			print('ERROR: short answer (%d bytes received)' % len(ans))
 			sys.exit(1)
 
 		# check answer
@@ -260,7 +260,7 @@ class ps2000(object):
 			return self._set_control(0x01, 0x00)
 
 	def set_output_off(self, off=True):
-		return self.set_remote(not off)
+		return self.set_output_on(not off)
 
 	# object 71
 	def get_actual(self, print_state = False):
