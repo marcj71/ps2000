@@ -335,7 +335,7 @@ class ps2000(object):
             if actual['OCP']:
                 print('over-current protection active')
             else:
-                print('over-current protection active')
+                print('over-current protection inactive')
 
             if actual['OPP']:
                 print('over-power protection active')
